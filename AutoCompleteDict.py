@@ -45,9 +45,9 @@ class Trie:
         node = self.root
         lim = 0
         results = []
+        self.substitution(word, results)
         self.insertion(word, results)
         self.deletion(word, results)
-        self.substitution(word, results)
         return results
 
     def insertion(self, word, retArray):
