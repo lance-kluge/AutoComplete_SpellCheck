@@ -23,7 +23,6 @@ def open_file():
 
 
 def save_to_file():
-    print("saving")
     file_path = filedialog.asksaveasfilename(defaultextension=".txt",
                                              filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
     if file_path:
@@ -149,10 +148,10 @@ def autocomplete():
 
 
 def spellcheck():
-    if not text_edit.tag_ranges("sel"):
+    if not text_edit.get(1.0, tk.END):
         var.set("No text to spell check")
     else:
-        line_list = text_edit.get(1.0, tk.END).split('\n')
+        line_list = text_edit.get(1.0, tk.END).lower().split('\n')
         line_index = 0
         for line in line_list:
             line_index += 1
