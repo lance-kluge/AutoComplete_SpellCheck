@@ -1,7 +1,39 @@
 import tkinter as tk
 import AutoCompleteDict as acd
+from tkinter import filedialog
+from tkinter import messagebox
 
 
+def open_file():
+
+    filepath = filedialog.askopenfilename(
+        defaultextension=".txt",
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+    )
+    if not filepath:
+        return  # No file selected
+
+    try:
+        with open(filepath, "r") as f:
+            text = f.read()
+            text_edit.delete("1.0", tk.END)
+            text_edit.insert(tk.END, text)
+    except Exception as e:
+        tk.messagebox.showerror("Error", f"Failed to open file: {e}")
+
+
+def save_to_file():
+    print("saving")
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt",
+                                             filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    if file_path:
+        try:
+            with open(file_path, 'w') as file:
+                text_content = text_edit.get("1.0", "end-1c")
+                file.write(text_content)
+            tk.messagebox.showinfo(title="Saved Text", message=f"File saved: {file_path}")
+        except Exception as e:
+            tk.messagebox.showinfo(title="Saved Text", message=f"Error saving file: {str(e)}")
 
 
 def main():
@@ -18,6 +50,16 @@ def main():
     text_edit.grid(row=0, column=1)
 
     frame = tk.Frame(window, relief=tk.RAISED, bd=2)
+
+    menubar = tk.Menu(window)
+    file_menu = tk.Menu(menubar, tearoff=0)
+    file_menu.add_command(label='Open', command=open_file)
+    file_menu.add_command(label='Save', command=save_to_file)
+    file_menu.add_separator()
+    file_menu.add_command(label='Exit', command=window.quit)
+    menubar.add_cascade(label='File', menu=file_menu)
+    window.config(menu=menubar)
+
     AutoComplete_button = tk.Button(frame, text='Autocomplete', command=autocomplete)
     spellCheck_button = tk.Button(frame, text='Spell Check', command=spellcheck)
     spell_Suggestions_button = tk.Button(frame, text='Spell Suggestions', command=spellSuggest)
@@ -43,14 +85,14 @@ def main():
     frame.grid(row=0, column=0, sticky="ns")
     scrollbar = tk.Scrollbar(window, command=text_edit.yview)
     text_edit.config(yscrollcommand=scrollbar.set)
-
+    window.config(menu=menubar)
     window.mainloop()
 
 
 def spellSuggest():
     global spellSuggestions
     if not text_edit.tag_ranges("sel"):
-         var.set("Please select a word")
+        var.set("Please select a word")
     else:
         text = text_edit.get('sel.first', 'sel.last')
         if (len(text) == 0) or len(text.replace(" ", "")) == 0 or len(text.replace("\n", "").replace(" ", "")) == 0:
@@ -85,7 +127,7 @@ def button_clicked(i):
 def autocomplete():
     global spellSuggestions
     if not text_edit.tag_ranges("sel"):
-         var.set("Please select a word")
+        var.set("Please select a word")
     else:
         text = text_edit.get('sel.first', 'sel.last')
         if (len(text) == 0) or len(text.replace(" ", "")) == 0 or len(text.replace("\n", "").replace(" ", "")) == 0:
@@ -108,7 +150,7 @@ def autocomplete():
 
 def spellcheck():
     if not text_edit.tag_ranges("sel"):
-         var.set("No text to spell check")
+        var.set("No text to spell check")
     else:
         line_list = text_edit.get(1.0, tk.END).split('\n')
         line_index = 0
